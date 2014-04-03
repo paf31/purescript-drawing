@@ -31,13 +31,13 @@ data Drawing
 
 renderIn :: forall eff. Rectangle -> Context2D -> Drawing -> Eff (canvas :: Canvas | eff) Context2D
 renderIn box ctx drawing = withContext ctx $ do
-  let factor = Math.min box.w box.h
-  scale { scaleX: factor, scaleY: factor } ctx
-
   let offsetX = if box.w > box.h then box.x else box.x + (box.h - box.w) / 2
   let offsetY = if box.h > box.w then box.y else box.y + (box.w - box.h) / 2
   translate { translateX: offsetX, translateY: offsetY } ctx
   
+  let factor = Math.min box.w box.h
+  scale { scaleX: factor, scaleY: factor } ctx
+
   go drawing
 
   where
