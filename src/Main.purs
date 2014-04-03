@@ -36,17 +36,21 @@ circle = Arc { cx: 0.5
 square :: Drawing
 square = Rectangle { x: 0, y: 0, w: 1, h: 1 }
 
-circles :: Number -> Drawing
-circles n = 
-  Composite $ flip map (range 0 (n - 1)) $ \i -> do  
-    let
-      theta = i / n * Math.pi * 2
-      rect = { x: 0.5 + 0.25 * Math.sin theta - 0.1
-             , y: 0.5 + 0.25 * Math.cos theta - 0.1
-             , w: 0.2
-             , h: 0.2
+snowflake :: Number -> Drawing
+snowflake n = go <<< go <<< go $ circle 
+  where
+  go = everywhere replace
+  replace (Arc { cx = cx, cy = cy, r = r }) = 
+    Composite $ flip map (range 0 (n - 1)) $ \i ->   
+      let
+        theta = i / n * Math.pi * 2
+      in Arc { cx: cx + r * 0.7 * Math.sin theta
+             , cy: cy + r * 0.7 * Math.cos theta
+             , r: r * 0.3
+             , start: 0
+             , end: Math.pi * 2
              }
-    Scaled rect circle
+  replace other = other
 
 gasket :: Drawing
 gasket = squaresToCircles <<< go <<< go <<< go <<< go <<< go $ square
@@ -85,7 +89,7 @@ main = do
   setStrokeStyle "#000000" ctx
   setLineWidth 0.02 ctx
 
-  let drawing = gasket 
+  let drawing = snowflake 5
   
   renderIn bounds ctx drawing
   
