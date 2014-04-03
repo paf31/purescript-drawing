@@ -25,7 +25,7 @@ main = do
   ctx <- getContext2D canvas
 
   setStrokeStyle "#000000" ctx
-  setLineWidth 5 ctx
+  setLineWidth 0.01 ctx
 
   renderIn bounds ctx $ 
     Arc { cx: 0.5
