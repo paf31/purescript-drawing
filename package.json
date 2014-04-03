@@ -1,5 +1,5 @@
 {
-  "name": "starter-kit",
+  "name": "canvas-dsl",
   "private": true,
   "devDependencies": {
     "grunt": "~0.4.4",
