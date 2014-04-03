@@ -1,6 +1,7 @@
 module Main where
 
 import Data.Array
+import Data.Tuple
 import Data.Traversable
 
 import Control.Monad.Eff
@@ -43,6 +44,12 @@ circles n =
              }
     Scaled rect circle
 
+sineWave :: Drawing
+sineWave = Path $ do
+  x <- 0 `range` 100
+  let y = Math.sin $ x / 100.0 * Math.pi * 4
+  return (Tuple (x / 100.0) (y / 4 + 0.5))
+
 main = do
   canvas <- getElementById "canvas"
   ctx <- getContext2D canvas
@@ -51,3 +58,5 @@ main = do
   setLineWidth 0.01 ctx
 
   renderIn bounds ctx $ circles 30
+  
+  -- renderIn bounds ctx sineWave 
