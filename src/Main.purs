@@ -3,6 +3,8 @@ module Main where
 import Data.Array
 import Data.Tuple
 import Data.Traversable
+import Data.Monoid
+import Data.Generics
 
 import Control.Monad.Eff
 
@@ -32,6 +34,9 @@ circle = Arc { cx: 0.5
              , end: Math.pi * 2 
              }
 
+square :: Drawing
+square = Rectangle { x: 0, y: 0, w: 1, h: 1 }
+
 circles :: Number -> Drawing
 circles n = 
   Composite $ flip map (range 0 (n - 1)) $ \i -> do  
@@ -44,6 +49,30 @@ circles n =
              }
     Scaled rect circle
 
+carpet :: Drawing
+carpet = squaresToCircles <<< go <<< go <<< go <<< go <<< go $ square
+  where
+  go :: Drawing -> Drawing
+  go = everywhere (mkT quarter)
+
+  quarter :: Drawing -> Drawing
+  quarter (Rectangle r) = 
+    let x' = r.x + r.w * 0.6
+        y' = r.y + r.h * 0.6
+        w' = r.w * 0.4
+        h' = r.h * 0.4
+    in Rectangle { x: r.x, y: y' , w: w', h: h' } <>
+       Rectangle { x: x' , y: y' , w: w', h: h' } <>
+       Rectangle { x: x' , y: r.y, w: w', h: h' }
+  quarter other = other
+
+  squaresToCircles :: Drawing -> Drawing
+  squaresToCircles = everywhere (mkT toCircle)
+  
+  toCircle :: Drawing -> Drawing
+  toCircle (Rectangle r) = Scaled r circle
+  toCircle other = other
+
 sineWave :: Drawing
 sineWave = Path $ do
   x <- 0 `range` 100
@@ -55,8 +84,11 @@ main = do
   ctx <- getContext2D canvas
 
   setStrokeStyle "#000000" ctx
-  setLineWidth 0.01 ctx
+  setLineWidth 0.02 ctx
 
-  renderIn bounds ctx $ circles 30
+  let drawing = carpet 
   
-  -- renderIn bounds ctx sineWave 
+  Debug.Trace.print drawing
+
+  renderIn bounds ctx drawing
+  
