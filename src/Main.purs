@@ -4,7 +4,6 @@ import Data.Array
 import Data.Tuple
 import Data.Traversable
 import Data.Monoid
-import Data.Generics
 
 import Control.Monad.Eff
 
@@ -49,11 +48,11 @@ circles n =
              }
     Scaled rect circle
 
-carpet :: Drawing
-carpet = squaresToCircles <<< go <<< go <<< go <<< go <<< go $ square
+gasket :: Drawing
+gasket = squaresToCircles <<< go <<< go <<< go <<< go <<< go $ square
   where
   go :: Drawing -> Drawing
-  go = everywhere (mkT quarter)
+  go = everywhere quarter
 
   quarter :: Drawing -> Drawing
   quarter (Rectangle r) = 
@@ -67,7 +66,7 @@ carpet = squaresToCircles <<< go <<< go <<< go <<< go <<< go $ square
   quarter other = other
 
   squaresToCircles :: Drawing -> Drawing
-  squaresToCircles = everywhere (mkT toCircle)
+  squaresToCircles = everywhere toCircle
   
   toCircle :: Drawing -> Drawing
   toCircle (Rectangle r) = Scaled r circle
@@ -86,9 +85,7 @@ main = do
   setStrokeStyle "#000000" ctx
   setLineWidth 0.02 ctx
 
-  let drawing = carpet 
+  let drawing = gasket 
   
-  Debug.Trace.print drawing
-
   renderIn bounds ctx drawing
   
