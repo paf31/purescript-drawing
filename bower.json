@@ -1,0 +1,29 @@
+{
+  "name": "canvas-dsl",
+  "version": "0.0.0",
+  "authors": [
+    "Phil Freeman <paf31@cantab.net>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "purescript-arrays": "*",
+    "purescript-canvas": "*",
+    "purescript-control": "*",
+    "purescript-either": "*",
+    "purescript-foldable-traversable": "*",
+    "purescript-generics": "*",
+    "purescript-math": "*",
+    "purescript-maybe": "*",
+    "purescript-monoid": "*",
+    "purescript-random": "*",
+    "purescript-tuples": "*"
+  }
+}
