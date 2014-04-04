@@ -14,7 +14,7 @@ module.exports = function(grunt) {
       lib: ["js", "externs"]
     },
   
-    "purescript-make": {
+    pscMake: {
       lib: {
         src: "<%=libFiles%>"
       }
@@ -23,9 +23,7 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks("grunt-contrib-clean");
   grunt.loadNpmTasks("grunt-purescript");
-  grunt.loadNpmTasks("grunt-execute");
   
-  grunt.registerTask("test", ["purescript:tests"]);
-  grunt.registerTask("lib", ["purescript-make:lib"]);
+  grunt.registerTask("lib", ["pscMake:lib"]);
   grunt.registerTask("default", ["lib"]);
 };
