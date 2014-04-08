@@ -32,11 +32,13 @@ data Drawing
   --
   | Scaled Rectangle Drawing
 
-instance monoidDrawing :: Monoid Drawing where
-  mempty = Composite []
+instance semigroupDrawing :: Semigroup Drawing where
   (<>) (Composite ds) d = Composite (ds <> [d])
   (<>) d (Composite ds) = Composite (d : ds)
   (<>) d1 d2 = Composite [d1, d2]
+
+instance monoidDrawing :: Monoid Drawing where
+  mempty = Composite []
 
 everywhere :: (Drawing -> Drawing) -> Drawing -> Drawing
 everywhere f (Composite ds) = f (Composite (map (everywhere f) ds))
