@@ -132,6 +132,14 @@ outlined :: OutlineStyle -> Shape -> Drawing
 
 Draw the outline of a `Shape`.
 
+#### `clipped`
+
+``` purescript
+clipped :: Shape -> Drawing -> Drawing
+```
+
+Clip a `Drawing` to a `Shape`.
+
 #### `scale`
 
 ``` purescript

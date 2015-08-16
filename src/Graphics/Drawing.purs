@@ -5,7 +5,7 @@ module Graphics.Drawing
   , Shape(), path, closed, rectangle, circle
   , FillStyle(), fillColor
   , OutlineStyle(), outlineColor, lineWidth
-  , Drawing(), filled, outlined, scale, translate, rotate
+  , Drawing(), filled, outlined, clipped, scale, translate, rotate
   , everywhere
   , render
   , module Graphics.Drawing.Color
@@ -102,6 +102,7 @@ data Drawing
   | Scale { scaleX :: Number, scaleY :: Number } Drawing
   | Translate { translateX :: Number, translateY :: Number } Drawing
   | Rotate Number Drawing
+  | Clipped Shape Drawing
 
 -- | Fill a `Shape`.
 filled :: FillStyle -> Shape -> Drawing
@@ -110,6 +111,10 @@ filled = flip Fill
 -- | Draw the outline of a `Shape`.
 outlined :: OutlineStyle -> Shape -> Drawing
 outlined = flip Outline
+
+-- | Clip a `Drawing` to a `Shape`.
+clipped :: Shape -> Drawing -> Drawing
+clipped = Clipped
 
 -- | Apply a scale transformation by providing the x and y scale factors.
 scale :: Number -> Number -> Drawing -> Drawing
@@ -139,6 +144,7 @@ everywhere f = go
   go (Scale s d) = f (Scale s (go d))
   go (Translate t d) = f (Translate t (go d))
   go (Rotate r d) = f (Rotate r (go d))
+  go (Clipped s d) = f (Clipped s (go d))
   go other = f other
     
 -- | Render a `Drawing` to a canvas.  
@@ -163,6 +169,10 @@ render ctx = go
   go (Rotate r d) = void $ Canvas.withContext ctx do 
     Canvas.rotate r ctx
     go d
+  go (Clipped sh d) = void $ Canvas.withContext ctx do 
+    renderShape sh
+    Canvas.clip ctx
+    go d
     
   applyFillStyle :: FillStyle -> Eff (canvas :: Canvas.Canvas | eff) Unit
   applyFillStyle (FillStyle fs) = do
@@ -176,9 +186,9 @@ render ctx = go
   renderShape :: Shape -> Eff (canvas :: Canvas.Canvas | eff) Unit
   renderShape = go
     where
-    go (Path closed (Cons p rest)) = do
+    go (Path cl (Cons p rest)) = do
       Canvas.moveTo ctx p.x p.y
       for_ rest \p -> Canvas.lineTo ctx p.x p.y
-      when closed $ void $ Canvas.closePath ctx
+      when cl $ void $ Canvas.closePath ctx
     go (Rectangle r) = void $ Canvas.rect ctx r
     go (Circle c) = void $ Canvas.arc ctx { x: c.x, y: c.y, r: c.r, start: 0.0, end: Math.pi * 2.0 }
