@@ -38,6 +38,16 @@ data Shape
   | Rectangle { x :: Number, y :: Number, w :: Number, h :: Number }
   -- | A circle consisting of the numbers center-x, center-y and radius
   | Circle { x :: Number, y :: Number, r :: Number }
+  -- | A composite shape
+  | Composite (List Shape)
+
+instance semigroupShape :: Semigroup Shape where
+  append (Composite ds) d = Composite (ds ++ singleton d)
+  append d (Composite ds) = Composite (d : ds)
+  append d1 d2 = Composite (Cons d1 (Cons d2 Nil))
+
+instance monoidShape :: Monoid Shape where
+  mempty = Composite mempty
 
 -- | Create a path.
 path :: forall f. (Foldable f) => f Point -> Shape
@@ -104,6 +114,14 @@ data Drawing
   | Rotate Number Drawing
   | Clipped Shape Drawing
 
+instance semigroupDrawing :: Semigroup Drawing where
+  append (Many ds) d = Many (ds ++ singleton d)
+  append d (Many ds) = Many (d : ds)
+  append d1 d2 = Many (Cons d1 (Cons d2 Nil))
+
+instance monoidDrawing :: Monoid Drawing where
+  mempty = Many mempty
+
 -- | Fill a `Shape`.
 filled :: FillStyle -> Shape -> Drawing
 filled = flip Fill
@@ -127,14 +145,6 @@ translate tx ty = Translate { translateX: tx, translateY: ty }
 -- | Apply a rotation by providing the angle.
 rotate :: Number -> Drawing -> Drawing
 rotate = Rotate
-
-instance semigroupDrawing :: Semigroup Drawing where
-  append (Many ds) d = Many (ds ++ singleton d)
-  append d (Many ds) = Many (d : ds)
-  append d1 d2 = Many (Cons d1 (Cons d2 Nil))
-
-instance monoidDrawing :: Monoid Drawing where
-  mempty = Many mempty
 
 -- | Modify a `Drawing` by applying a transformation to every subdrawing.
 everywhere :: (Drawing -> Drawing) -> Drawing -> Drawing
@@ -192,3 +202,4 @@ render ctx = go
       when cl $ void $ Canvas.closePath ctx
     go (Rectangle r) = void $ Canvas.rect ctx r
     go (Circle c) = void $ Canvas.arc ctx { x: c.x, y: c.y, r: c.r, start: 0.0, end: Math.pi * 2.0 }
+    go (Composite ds) = for_ ds go
