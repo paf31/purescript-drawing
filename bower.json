@@ -11,6 +11,10 @@
     "test",
     "tests"
   ],
+  "repository": {                                                 
+    "type": "git",                                                
+    "url": "git://github.com/paf31/purescript-drawing.git"   
+  },                                                               
   "dependencies": {
     "purescript-canvas": "~0.3.1",
     "purescript-lists": "~0.7.1",
