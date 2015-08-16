@@ -12,16 +12,8 @@
     "tests"
   ],
   "dependencies": {
-    "purescript-arrays": "~0.3.2",
-    "purescript-canvas": "~0.2.0",
-    "purescript-control": "~0.2.1",
-    "purescript-either": "~0.1.4",
-    "purescript-foldable-traversable": "~0.3.0",
-    "purescript-generics": "~0.2.0",
-    "purescript-math": "~0.1.0",
-    "purescript-maybe": "~0.2.1",
-    "purescript-monoid": "~0.2.0",
-    "purescript-random": "~0.1.2",
-    "purescript-tuples": "~0.3.0"
+    "purescript-canvas": "~0.3.1",
+    "purescript-lists": "~0.7.1",
+    "purescript-math": "~0.2.0"
   }
 }
