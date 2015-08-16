@@ -26,6 +26,14 @@ path :: forall f. (Foldable f) => f Point -> Shape
 
 Create a path.
 
+#### `closed`
+
+``` purescript
+closed :: forall f. (Foldable f) => f Point -> Shape
+```
+
+Create a _closed_ path.
+
 #### `rectangle`
 
 ``` purescript
@@ -42,21 +50,57 @@ circle :: Number -> Number -> Number -> Shape
 
 Create a circle from the left, top and radius parameters.
 
-#### `Style`
+#### `FillStyle`
 
 ``` purescript
-data Style
+newtype FillStyle
 ```
 
-Encapsulates colors etc.
+Encapsulates fill color etc.
 
-#### `defaultStyle`
+##### Instances
+``` purescript
+instance semigroupFillStyle :: Semigroup FillStyle
+instance monoidFillStyle :: Monoid FillStyle
+```
+
+#### `fillColor`
 
 ``` purescript
-defaultStyle :: Style
+fillColor :: Color -> FillStyle
 ```
 
-The default style
+Set the fill color.
+
+#### `OutlineStyle`
+
+``` purescript
+newtype OutlineStyle
+```
+
+Encapsulates outline color etc.
+
+##### Instances
+``` purescript
+instance semigroupOutlineStyle :: Semigroup OutlineStyle
+instance monoidOutlineStyle :: Monoid OutlineStyle
+```
+
+#### `outlineColor`
+
+``` purescript
+outlineColor :: Color -> OutlineStyle
+```
+
+Set the outline color.
+
+#### `lineWidth`
+
+``` purescript
+lineWidth :: Number -> OutlineStyle
+```
+
+Set the line width.
 
 #### `Drawing`
 
@@ -75,7 +119,7 @@ instance monoidDrawing :: Monoid Drawing
 #### `filled`
 
 ``` purescript
-filled :: Shape -> Style -> Drawing
+filled :: FillStyle -> Shape -> Drawing
 ```
 
 Fill a `Shape`.
@@ -83,7 +127,7 @@ Fill a `Shape`.
 #### `outlined`
 
 ``` purescript
-outlined :: Shape -> Style -> Drawing
+outlined :: OutlineStyle -> Shape -> Drawing
 ```
 
 Draw the outline of a `Shape`.
