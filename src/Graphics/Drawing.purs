@@ -5,6 +5,7 @@ module Graphics.Drawing
   , Shape(), path, closed, rectangle, circle
   , FillStyle(), fillColor
   , OutlineStyle(), outlineColor, lineWidth
+  , Shadow(), shadowOffset, shadowBlur, shadowColor, shadow
   , Drawing(), filled, outlined, clipped, scale, translate, rotate
   , everywhere
   , render
@@ -103,6 +104,37 @@ instance monoidOutlineStyle :: Monoid OutlineStyle where
   mempty = OutlineStyle { color: Nothing
                         , lineWidth: Nothing
                         }
+                        
+-- | Encapsulates shadow settings etc.
+newtype Shadow = Shadow 
+  { color  :: Maybe Color
+  , blur   :: Maybe Number
+  , offset :: Maybe { x :: Number, y :: Number }
+  }
+  
+-- | Set the shadow color.
+shadowColor :: Color -> Shadow
+shadowColor c = Shadow { color: Just c, blur: Nothing, offset: Nothing }
+  
+-- | Set the shadow blur.
+shadowBlur :: Number -> Shadow
+shadowBlur b = Shadow { color: Nothing, blur: Just b, offset: Nothing }
+  
+-- | Set the shadow blur.
+shadowOffset :: Number -> Number -> Shadow
+shadowOffset x y = Shadow { color: Nothing, blur: Nothing, offset: Just { x: x, y: y } }
+
+instance semigroupShadow :: Semigroup Shadow where
+  append (Shadow s1) (Shadow s2) = Shadow { color:  s1.color   <|> s2.color
+                                          , blur:   s1.blur    <|> s2.blur 
+                                          , offset: s1.offset  <|> s2.offset
+                                          }
+
+instance monoidShadow :: Monoid Shadow where
+  mempty = Shadow { color: Nothing
+                  , blur: Nothing
+                  , offset: Nothing
+                  }
 
 -- | A vector `Drawing`.
 data Drawing 
@@ -113,6 +145,7 @@ data Drawing
   | Translate { translateX :: Number, translateY :: Number } Drawing
   | Rotate Number Drawing
   | Clipped Shape Drawing
+  | WithShadow Shadow Drawing
 
 instance semigroupDrawing :: Semigroup Drawing where
   append (Many ds) d = Many (ds ++ singleton d)
@@ -133,6 +166,10 @@ outlined = flip Outline
 -- | Clip a `Drawing` to a `Shape`.
 clipped :: Shape -> Drawing -> Drawing
 clipped = Clipped
+
+-- | Apply a `Shadow` to a `Drawing`.
+shadow :: Shadow -> Drawing -> Drawing
+shadow = WithShadow
 
 -- | Apply a scale transformation by providing the x and y scale factors.
 scale :: Number -> Number -> Drawing -> Drawing
@@ -155,6 +192,7 @@ everywhere f = go
   go (Translate t d) = f (Translate t (go d))
   go (Rotate r d) = f (Rotate r (go d))
   go (Clipped s d) = f (Clipped s (go d))
+  go (WithShadow s d) = f (WithShadow s (go d))
   go other = f other
     
 -- | Render a `Drawing` to a canvas.  
@@ -183,6 +221,17 @@ render ctx = go
     renderShape sh
     Canvas.clip ctx
     go d
+  go (WithShadow sh d) = void $ Canvas.withContext ctx do 
+    applyShadow sh
+    go d
+    
+  applyShadow :: Shadow -> Eff (canvas :: Canvas.Canvas | eff) Unit
+  applyShadow (Shadow s) = do
+    for_ s.color \color -> Canvas.setShadowColor (colorString color) ctx
+    for_ s.blur \blur -> Canvas.setShadowBlur blur ctx
+    for_ s.offset \offset -> do
+      Canvas.setShadowOffsetX offset.x ctx
+      Canvas.setShadowOffsetY offset.y ctx
     
   applyFillStyle :: FillStyle -> Eff (canvas :: Canvas.Canvas | eff) Unit
   applyFillStyle (FillStyle fs) = do
