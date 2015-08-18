@@ -57,13 +57,13 @@ hsl h s l = rgb (rgb1.r + m) (rgb1.g + m) (rgb1.b + m)
   
 -- | Lighten a color by the specified amount between 0 and 1.
 lighten :: Number -> Color -> Color
-lighten l (Color r g b) = Color (interp r) (interp b) (interp b)
+lighten l (Color r g b) = Color (interp r) (interp g) (interp b)
   where
   interp c = 255.0 * l + c * (1.0 - l)
  
 -- | Darken a color by the specified amount between 0 and 1.
 darken :: Number -> Color -> Color
-darken d (Color r g b) = Color (interp r) (interp b) (interp b)
+darken d (Color r g b) = Color (interp r) (interp g) (interp b)
   where
   interp c = c * (1.0 - d)
 
