@@ -18,6 +18,12 @@ data Shape
 
 A single shape.
 
+##### Instances
+``` purescript
+instance semigroupShape :: Semigroup Shape
+instance monoidShape :: Monoid Shape
+```
+
 #### `path`
 
 ``` purescript
@@ -102,6 +108,44 @@ lineWidth :: Number -> OutlineStyle
 
 Set the line width.
 
+#### `Shadow`
+
+``` purescript
+newtype Shadow
+```
+
+Encapsulates shadow settings etc.
+
+##### Instances
+``` purescript
+instance semigroupShadow :: Semigroup Shadow
+instance monoidShadow :: Monoid Shadow
+```
+
+#### `shadowColor`
+
+``` purescript
+shadowColor :: Color -> Shadow
+```
+
+Set the shadow color.
+
+#### `shadowBlur`
+
+``` purescript
+shadowBlur :: Number -> Shadow
+```
+
+Set the shadow blur.
+
+#### `shadowOffset`
+
+``` purescript
+shadowOffset :: Number -> Number -> Shadow
+```
+
+Set the shadow blur.
+
 #### `Drawing`
 
 ``` purescript
@@ -139,6 +183,14 @@ clipped :: Shape -> Drawing -> Drawing
 ```
 
 Clip a `Drawing` to a `Shape`.
+
+#### `shadow`
+
+``` purescript
+shadow :: Shadow -> Drawing -> Drawing
+```
+
+Apply a `Shadow` to a `Drawing`.
 
 #### `scale`
 
