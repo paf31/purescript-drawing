@@ -216,6 +216,14 @@ rotate :: Number -> Drawing -> Drawing
 
 Apply a rotation by providing the angle.
 
+#### `text`
+
+``` purescript
+text :: Font -> Number -> Number -> FillStyle -> String -> Drawing
+```
+
+Render some text.
+
 #### `everywhere`
 
 ``` purescript

@@ -6,10 +6,11 @@ module Graphics.Drawing
   , FillStyle(), fillColor
   , OutlineStyle(), outlineColor, lineWidth
   , Shadow(), shadowOffset, shadowBlur, shadowColor, shadow
-  , Drawing(), filled, outlined, clipped, scale, translate, rotate
+  , Drawing(), filled, outlined, clipped, scale, translate, rotate, text
   , everywhere
   , render
   , module Graphics.Drawing.Color
+  , module Graphics.Drawing.Font
   ) where
       
 import Prelude
@@ -27,6 +28,7 @@ import Control.Monad.Eff
 import qualified Graphics.Canvas as Canvas
 
 import Graphics.Drawing.Color
+import Graphics.Drawing.Font (Font(), fontString)
 
 -- | A `Point` consists of `x` and `y` coordinates.
 type Point = { x :: Number, y :: Number }
@@ -140,6 +142,7 @@ instance monoidShadow :: Monoid Shadow where
 data Drawing 
   = Fill Shape FillStyle
   | Outline Shape OutlineStyle
+  | Text Font Number Number FillStyle String
   | Many (List Drawing)
   | Scale { scaleX :: Number, scaleY :: Number } Drawing
   | Translate { translateX :: Number, translateY :: Number } Drawing
@@ -183,6 +186,10 @@ translate tx ty = Translate { translateX: tx, translateY: ty }
 rotate :: Number -> Drawing -> Drawing
 rotate = Rotate
 
+-- | Render some text.
+text :: Font -> Number -> Number -> FillStyle -> String -> Drawing
+text = Text
+
 -- | Modify a `Drawing` by applying a transformation to every subdrawing.
 everywhere :: (Drawing -> Drawing) -> Drawing -> Drawing
 everywhere f = go
@@ -224,6 +231,10 @@ render ctx = go
   go (WithShadow sh d) = void $ Canvas.withContext ctx do 
     applyShadow sh
     go d
+  go (Text font x y style s) = void $ Canvas.withContext ctx do 
+    Canvas.setFont (fontString font) ctx
+    applyFillStyle style
+    Canvas.fillText ctx s x y
     
   applyShadow :: Shadow -> Eff (canvas :: Canvas.Canvas | eff) Unit
   applyShadow (Shadow s) = do
@@ -243,12 +254,11 @@ render ctx = go
     for_ fs.lineWidth $ \width -> Canvas.setLineWidth width ctx
   
   renderShape :: Shape -> Eff (canvas :: Canvas.Canvas | eff) Unit
-  renderShape = go
-    where
-    go (Path cl (Cons p rest)) = do
-      Canvas.moveTo ctx p.x p.y
-      for_ rest \p -> Canvas.lineTo ctx p.x p.y
-      when cl $ void $ Canvas.closePath ctx
-    go (Rectangle r) = void $ Canvas.rect ctx r
-    go (Circle c) = void $ Canvas.arc ctx { x: c.x, y: c.y, r: c.r, start: 0.0, end: Math.pi * 2.0 }
-    go (Composite ds) = for_ ds go
+  renderShape (Path _ Nil) = return unit
+  renderShape (Path cl (Cons p rest)) = do
+    Canvas.moveTo ctx p.x p.y
+    for_ rest \p -> Canvas.lineTo ctx p.x p.y
+    when cl $ void $ Canvas.closePath ctx
+  renderShape (Rectangle r) = void $ Canvas.rect ctx r
+  renderShape (Circle c) = void $ Canvas.arc ctx { x: c.x, y: c.y, r: c.r, start: 0.0, end: Math.pi * 2.0 }
+  renderShape (Composite ds) = for_ ds renderShape

@@ -3,6 +3,7 @@ module Test.Main where
 import Prelude
 
 import Data.Maybe
+import Data.Monoid (mempty)
 import Data.Foldable (fold)
 
 import Control.Monad.Eff
@@ -29,4 +30,6 @@ main = do
                    , { x: 0.0,   y: 100.0 }
                    , { x: 100.0, y: 100.0 }
                    ]
+    , shadow (shadowColor black <> shadowBlur 2.0) $
+        text (font cursive 24 mempty) 10.0 140.0 (fillColor red) "purescript-drawing" 
     ]
