@@ -17,7 +17,11 @@ main = do
   Just canvas <- getCanvasElementById "canvas"
   ctx <- getContext2D canvas
 
-  render ctx $ translate 400.0 400.0 $ scale 200.0 200.0 $ go 5
+  render ctx $ 
+    shadow (shadowColor black <> shadowBlur 10.0) $
+      translate 400.0 400.0 $ 
+        scale 200.0 200.0 $ 
+          go 6
   where
   s = 0.375
       
