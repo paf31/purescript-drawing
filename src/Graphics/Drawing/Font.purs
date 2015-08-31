@@ -16,7 +16,12 @@ import Control.Alt ((<|>))
 
 -- | Fonts.
 data Font = Font FontFamily Int FontOptions
-    
+
+instance eqFont :: Eq Font where
+  eq (Font a b c) (Font a' b' c') = a == a'
+                                 && b == b'
+                                 && c == c'
+
 -- | Create a `Font`.
 font :: FontFamily -> Int -> FontOptions -> Font
 font = Font
@@ -26,8 +31,11 @@ fontString :: Font -> String
 fontString (Font (FontFamily family) px opts) = optionsString opts ++ " " ++ show px ++ "px " ++ family
   
 -- | Font family.
-newtype FontFamily = FontFamily String  
-  
+newtype FontFamily = FontFamily String
+
+instance eqFontFamily :: Eq FontFamily where
+  eq (FontFamily a) (FontFamily a') = a == a'
+
 -- | Serif font
 serif :: FontFamily
 serif = FontFamily "serif"
@@ -58,7 +66,12 @@ newtype FontOptions = FontOptions
   , variant  :: Maybe String
   , weight   :: Maybe String
   }
-  
+
+instance eqFontOptions :: Eq FontOptions where
+  eq (FontOptions a) (FontOptions a') = a.style == a'.style
+                                     && a.variant == a'.variant
+                                     && a.weight == a'.weight
+
 optionsString :: FontOptions -> String
 optionsString (FontOptions opts) = intercalate " "
   [ fold opts.style

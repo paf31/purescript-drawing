@@ -36,6 +36,11 @@ import Math
 -- | Colors.
 data Color = Color Number Number Number
 
+instance eqColor :: Eq Color where
+  eq (Color r g b) (Color r' g' b') = r == r'
+                                   && g == g'
+                                   && b == b'
+
 -- | Create a `Color` from RGB values between 0.0 and 255.0.
 rgb :: Number -> Number -> Number -> Color
 rgb = Color

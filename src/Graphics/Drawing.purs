@@ -52,6 +52,20 @@ instance semigroupShape :: Semigroup Shape where
 instance monoidShape :: Monoid Shape where
   mempty = Composite mempty
 
+instance eqShape :: Eq Shape where
+  eq (Path a b) (Path a' b') = a == a'
+                            && map _.x b == map _.x b'
+                            && map _.y b == map _.y b'
+  eq (Rectangle a) (Rectangle a') = a.x == a'.x
+                                 && a.y == a'.y
+                                 && a.w == a'.w
+                                 && a.h == a'.h
+  eq (Circle a) (Circle a') = a.x == a'.x
+                           && a.y == a'.y
+                           && a.r == a'.r
+  eq (Composite a) (Composite a') = a == a'
+  eq _ _ = false
+
 -- | Create a path.
 path :: forall f. (Foldable f) => f Point -> Shape
 path = Path false <<< toList
@@ -78,7 +92,10 @@ instance semigroupFillStyle :: Semigroup FillStyle where
 
 instance monoidFillStyle :: Monoid FillStyle where
   mempty = FillStyle { color: Nothing }
-  
+
+instance eqFillStyle :: Eq FillStyle where
+  eq (FillStyle a) (FillStyle a') = a.color == a'.color
+
 -- | Set the fill color.
 fillColor :: Color -> FillStyle
 fillColor c = FillStyle { color: Just c }
@@ -106,14 +123,27 @@ instance monoidOutlineStyle :: Monoid OutlineStyle where
   mempty = OutlineStyle { color: Nothing
                         , lineWidth: Nothing
                         }
-                        
+
+instance eqOutlineStyle :: Eq OutlineStyle where
+  eq (OutlineStyle a) (OutlineStyle a') = a.color == a'.color
+                                       && a.lineWidth == a'.lineWidth
+
 -- | Encapsulates shadow settings etc.
 newtype Shadow = Shadow 
   { color  :: Maybe Color
   , blur   :: Maybe Number
   , offset :: Maybe { x :: Number, y :: Number }
   }
-  
+
+instance eqShadow :: Eq Shadow where
+  eq (Shadow a) (Shadow a') = a.color == a'.color
+                           && a.blur  == a'.blur
+                           && maybe (isNothing a'.offset)
+                                    (\o -> maybe false
+                                                 (\o' -> o.x == o'.x && o.y == o'.y)
+                                                 a'.offset)
+                                    a.offset
+
 -- | Set the shadow color.
 shadowColor :: Color -> Shadow
 shadowColor c = Shadow { color: Just c, blur: Nothing, offset: Nothing }
@@ -157,6 +187,31 @@ instance semigroupDrawing :: Semigroup Drawing where
 
 instance monoidDrawing :: Monoid Drawing where
   mempty = Many mempty
+
+instance eqDrawing :: Eq Drawing where
+  eq (Fill a b) (Fill a' b') = a == a'
+                            && b == b'
+  eq (Outline a b) (Outline a' b') = a == a'
+                                  && b == b'
+  eq (Text a b c d e) (Text a' b' c' d' e') = a == a'
+                                           && b == b'
+                                           && c == c'
+                                           && d == d'
+                                           && e == e'
+  eq (Many a) (Many a') = a == a'
+  eq (Scale a b) (Scale a' b') = a.scaleX == a'.scaleX
+                              && a.scaleY == a'.scaleY
+                              && b == b'
+  eq (Translate a b) (Translate a' b') = a.translateX == a'.translateX
+                                      && a.translateY == a'.translateY
+                                      && b == b'
+  eq (Rotate a b) (Rotate a' b') = a == a'
+                                && b == b'
+  eq (Clipped a b) (Clipped a' b') = a == a'
+                                  && b == b'
+  eq (WithShadow a b) (WithShadow a' b') = a == a'
+                                        && b == b'
+  eq _ _ = false
 
 -- | Fill a `Shape`.
 filled :: FillStyle -> Shape -> Drawing
