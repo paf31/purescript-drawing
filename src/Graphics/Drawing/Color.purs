@@ -47,7 +47,9 @@ rgb = Color
 
 -- | Create a `Color` from hue (0.0-360.0), saturation (0.0-1) and lightness (0.0-1) values.
 hsl :: Number -> Number -> Number -> Color
-hsl h s l = rgb (rgb1.r + m) (rgb1.g + m) (rgb1.b + m)
+hsl h s l = rgb (255.0 * (rgb1.r + m))
+                (255.0 * (rgb1.g + m))
+                (255.0 * (rgb1.b + m))
   where
   h'  = h / 60.0
   chr = (1.0 - abs (2.0 * l - 1.0)) * s
