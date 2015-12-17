@@ -1,32 +1,33 @@
 -- | This module defines preset colors, and functions for creating colors.
 
-module Graphics.Drawing.Color 
+module Graphics.Drawing.Color
   ( Color()
-  
+
   , colorString
-  
+
   , rgb
+  , rgba
   , hsl
-  
+
   , lighten
   , darken
-  
-  , white	
-  , silver	
-  , gray	
-  , black	
-  , red	    
-  , maroon	
-  , yellow	
-  , olive	
-  , lime	
-  , green	
-  , aqua	
-  , teal	
-  , blue	
-  , navy	
-  , fuchsia	
-  , purple	
+
+  , white
+  , silver
+  , gray
+  , black
+  , red
+  , maroon
+  , yellow
+  , olive
+  , lime
+  , green
+  , aqua
+  , teal
+  , blue
+  , navy
+  , fuchsia
+  , purple
   ) where
 
 import Prelude
@@ -34,16 +35,21 @@ import Prelude
 import Math
 
 -- | Colors.
-data Color = Color Number Number Number
+data Color = Color Number Number Number Number
 
 instance eqColor :: Eq Color where
-  eq (Color r g b) (Color r' g' b') = r == r'
-                                   && g == g'
-                                   && b == b'
+  eq (Color r g b a) (Color r' g' b' a') = r == r'
+                                        && g == g'
+                                        && b == b'
+                                        && a == a'
 
 -- | Create a `Color` from RGB values between 0.0 and 255.0.
 rgb :: Number -> Number -> Number -> Color
-rgb = Color
+rgb r g b = Color r g b 1.0
+
+-- | Create a `Color` from RGBA values between 0.0 and 255.0 (rgb), 0.0 and 1.0 (a)
+rgba :: Number -> Number -> Number -> Number -> Color
+rgba = Color
 
 -- | Create a `Color` from hue (0.0-360.0), saturation (0.0-1) and lightness (0.0-1) values.
 hsl :: Number -> Number -> Number -> Color
@@ -61,24 +67,22 @@ hsl h s l = rgb (255.0 * (rgb1.r + m))
        | 3.0 <= h' && h' < 4.0 = { r: 0.0, g: x  , b: chr }
        | 4.0 <= h' && h' < 5.0 = { r: x  , g: 0.0, b: chr }
        | otherwise             = { r: chr, g: 0.0, b: x   }
-  
+
 -- | Lighten a color by the specified amount between 0 and 1.
 lighten :: Number -> Color -> Color
-lighten l (Color r g b) = Color (interp r) (interp g) (interp b)
+lighten l (Color r g b a) = Color (interp r) (interp g) (interp b) a
   where
   interp c = 255.0 * l + c * (1.0 - l)
- 
+
 -- | Darken a color by the specified amount between 0 and 1.
 darken :: Number -> Color -> Color
-darken d (Color r g b) = Color (interp r) (interp g) (interp b)
+darken d (Color r g b a) = Color (interp r) (interp g) (interp b) a
   where
   interp c = c * (1.0 - d)
 
-foreign import byteToHex :: Number -> String
-
 -- | Render a color as a HTML color string.
 colorString :: Color -> String
-colorString (Color r g b) = "#" <> byteToHex r <> byteToHex g <> byteToHex b
+colorString (Color r g b a) = "rgba(" <> show r <> "," <> show g <> "," <> show b <> "," <> show a <> ")"
 
 white :: Color
 white = rgb 255.0 255.0 255.0
