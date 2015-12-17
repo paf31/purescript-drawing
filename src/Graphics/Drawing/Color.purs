@@ -33,6 +33,7 @@ module Graphics.Drawing.Color
 import Prelude
 
 import Math
+import qualified Data.Int as I
 
 -- | Colors.
 data Color = Color Number Number Number Number
@@ -82,7 +83,7 @@ darken d (Color r g b a) = Color (interp r) (interp g) (interp b) a
 
 -- | Render a color as a HTML color string.
 colorString :: Color -> String
-colorString (Color r g b a) = "rgba(" <> show r <> "," <> show g <> "," <> show b <> "," <> show a <> ")"
+colorString (Color r g b a) = "rgba(" <> show (I.floor r) <> "," <> show (I.floor g) <> "," <> show (I.floor b) <> "," <> show a <> ")"
 
 white :: Color
 white = rgb 255.0 255.0 255.0
