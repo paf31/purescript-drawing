@@ -29,7 +29,7 @@ main = do
   go n = 
     let dr = scale s s (go (n - 1))
     in filled (fillColor (lighten (1.0 - toNumber n / 6.0) black)) (closed pentagon) 
-       <> fold do i <- 0..5
+       <> fold do i <- 0..4
                   return (rotate (Math.pi / 2.5 * (toNumber i + 0.5)) (translate 0.0 (Math.cos (Math.pi / 5.0) * (1.0 + s)) dr))
 
   pentagon = do
