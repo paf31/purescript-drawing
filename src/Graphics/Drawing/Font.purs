@@ -1,6 +1,6 @@
 -- | This module defines preset fonts, and functions for creating fonts.
 
-module Graphics.Drawing.Font 
+module Graphics.Drawing.Font
   ( Font(), font, fontString
   , FontFamily(), serif, sansSerif, monospace, cursive, fantasy, customFont
   , FontOptions(), bold, bolder, light, italic, oblique, smallCaps
@@ -8,9 +8,9 @@ module Graphics.Drawing.Font
 
 import Prelude
 
-import Data.Maybe
-import Data.Monoid
-import Data.Foldable (fold, foldMap, intercalate)
+import Data.Maybe (Maybe(..))
+import Data.Monoid (class Monoid)
+import Data.Foldable (fold, intercalate)
 
 import Control.Alt ((<|>))
 
@@ -29,7 +29,7 @@ font = Font
 -- | Turn a `Font` into a `String` which can be used with `Graphics.Canvas.setFont`.
 fontString :: Font -> String
 fontString (Font (FontFamily family) px opts) = optionsString opts ++ " " ++ show px ++ "px " ++ family
-  
+
 -- | Font family.
 newtype FontFamily = FontFamily String
 
@@ -59,9 +59,9 @@ fantasy = FontFamily "fantasy"
 -- | Use a custom font
 customFont :: String -> FontFamily
 customFont = FontFamily
-  
+
 -- | Encapsulates font options.
-newtype FontOptions = FontOptions 
+newtype FontOptions = FontOptions
   { style    :: Maybe String
   , variant  :: Maybe String
   , weight   :: Maybe String
@@ -78,36 +78,36 @@ optionsString (FontOptions opts) = intercalate " "
   , fold opts.variant
   , fold opts.weight
   ]
-  
+
 -- | Use a bold font.
 bold :: FontOptions
 bold = FontOptions { style: Nothing, variant: Nothing, weight: Just "bold" }
-  
+
 -- | Use a bolder font.
 bolder :: FontOptions
 bolder = FontOptions { style: Nothing, variant: Nothing, weight: Just "bolder" }
-  
+
 -- | Use a light font.
 light :: FontOptions
 light = FontOptions { style: Nothing, variant: Nothing, weight: Just "lighter" }
-  
+
 -- | Use an italic style.
 italic :: FontOptions
 italic = FontOptions { style: Just "italic", variant: Nothing, weight: Nothing }
-  
+
 -- | Use an oblique style.
 oblique :: FontOptions
 oblique = FontOptions { style: Just "oblique", variant: Nothing, weight: Nothing }
-  
+
 -- | Use small caps.
 smallCaps :: FontOptions
 smallCaps = FontOptions { style: Nothing, variant: Just "small-caps", weight: Nothing }
 
 instance semigroupFontOptions :: Semigroup FontOptions where
-  append (FontOptions fo1) (FontOptions fo2) = 
-    FontOptions { style:     fo1.style   <|> fo2.style  
+  append (FontOptions fo1) (FontOptions fo2) =
+    FontOptions { style:     fo1.style   <|> fo2.style
                 , variant:   fo1.variant <|> fo2.variant
-                , weight:    fo1.weight  <|> fo2.weight 
+                , weight:    fo1.weight  <|> fo2.weight
                 }
 
 instance monoidFontOptions :: Monoid FontOptions where

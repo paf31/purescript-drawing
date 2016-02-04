@@ -20,8 +20,9 @@ A single shape.
 
 ##### Instances
 ``` purescript
-instance semigroupShape :: Semigroup Shape
-instance monoidShape :: Monoid Shape
+Semigroup Shape
+Monoid Shape
+Eq Shape
 ```
 
 #### `path`
@@ -66,8 +67,9 @@ Encapsulates fill color etc.
 
 ##### Instances
 ``` purescript
-instance semigroupFillStyle :: Semigroup FillStyle
-instance monoidFillStyle :: Monoid FillStyle
+Semigroup FillStyle
+Monoid FillStyle
+Eq FillStyle
 ```
 
 #### `fillColor`
@@ -88,8 +90,9 @@ Encapsulates outline color etc.
 
 ##### Instances
 ``` purescript
-instance semigroupOutlineStyle :: Semigroup OutlineStyle
-instance monoidOutlineStyle :: Monoid OutlineStyle
+Semigroup OutlineStyle
+Monoid OutlineStyle
+Eq OutlineStyle
 ```
 
 #### `outlineColor`
@@ -118,8 +121,9 @@ Encapsulates shadow settings etc.
 
 ##### Instances
 ``` purescript
-instance semigroupShadow :: Semigroup Shadow
-instance monoidShadow :: Monoid Shadow
+Eq Shadow
+Semigroup Shadow
+Monoid Shadow
 ```
 
 #### `shadowColor`
@@ -156,8 +160,9 @@ A vector `Drawing`.
 
 ##### Instances
 ``` purescript
-instance semigroupDrawing :: Semigroup Drawing
-instance monoidDrawing :: Monoid Drawing
+Semigroup Drawing
+Monoid Drawing
+Eq Drawing
 ```
 
 #### `filled`
@@ -238,6 +243,191 @@ Modify a `Drawing` by applying a transformation to every subdrawing.
 render :: forall eff. Context2D -> Drawing -> Eff (canvas :: Canvas | eff) Unit
 ```
 
-Render a `Drawing` to a canvas.  
+Render a `Drawing` to a canvas.
 
+
+### Re-exported from Color:
+
+#### `Color`
+
+``` purescript
+data Color
+```
+
+The representation of a color.
+
+##### Instances
+``` purescript
+Show Color
+Eq Color
+```
+
+#### `black`
+
+``` purescript
+black :: Color
+```
+
+The color black.
+
+#### `complementary`
+
+``` purescript
+complementary :: Color -> Color
+```
+
+Get the complementary color (hue rotated by 180°).
+
+#### `cssStringHSLA`
+
+``` purescript
+cssStringHSLA :: Color -> String
+```
+
+The CSS representation of the color in the form `hsl(..)` or `hsla(...)`.
+
+#### `darken`
+
+``` purescript
+darken :: Number -> Color -> Color
+```
+
+Darken a color by subtracting a certain amount (number between -1.0 and
+1.0) from the lightness channel. If the number is negative, the color is
+lightened.
+
+#### `desaturate`
+
+``` purescript
+desaturate :: Number -> Color -> Color
+```
+
+Decrease the saturation of a color by subtracting a certain amount (number
+between -1.0 and 1.0) from the saturation channel. If the number is
+negative, the color is saturated.
+
+#### `grayscale`
+
+``` purescript
+grayscale :: Number -> Color
+```
+
+Create a gray tone from a lightness values (0.0 is black, 1.0 is white).
+
+#### `hsl`
+
+``` purescript
+hsl :: Number -> Number -> Number -> Color
+```
+
+Create a `Color` from hue, saturation, lightness and alpha values.
+
+#### `hsla`
+
+``` purescript
+hsla :: Number -> Number -> Number -> Number -> Color
+```
+
+Create a `Color` from hue, saturation, lightness and alpha values.
+
+#### `lighten`
+
+``` purescript
+lighten :: Number -> Color -> Color
+```
+
+Lighten a color by adding a certain amount (number between -1.0 and 1.0)
+to the lightness channel. If the number is negative, the color is
+darkened.
+
+#### `rgb`
+
+``` purescript
+rgb :: Int -> Int -> Int -> Color
+```
+
+Create a `Color` from RGB values between 0 and 255.
+
+#### `rgb'`
+
+``` purescript
+rgb' :: Number -> Number -> Number -> Color
+```
+
+Create a `Color` from RGB values between 0.0 and 1.0.
+
+#### `rgba`
+
+``` purescript
+rgba :: Int -> Int -> Int -> Number -> Color
+```
+
+Create a `Color` from integer RGB values between 0 and 255 and a floating
+point alpha value between 0.0 and 1.0.
+
+#### `rgba'`
+
+``` purescript
+rgba' :: Number -> Number -> Number -> Number -> Color
+```
+
+Create a `Color` from RGB values between 0.0 and 1.0 and an alpha value
+between 0.0 and 1.0.
+
+#### `saturate`
+
+``` purescript
+saturate :: Number -> Color -> Color
+```
+
+Increase the saturation of a color by adding a certain amount (number
+between -1.0 and 1.0) to the saturation channel. If the number is
+negative, the color is desaturated.
+
+#### `toHSLA`
+
+``` purescript
+toHSLA :: Color -> { h :: Number, s :: Number, l :: Number, a :: Number }
+```
+
+Convert a `Color` to its hue, saturation, lightness and alpha values.
+
+#### `toRGBA`
+
+``` purescript
+toRGBA :: Color -> { r :: Int, g :: Int, b :: Int, a :: Number }
+```
+
+Convert a `Color` to its red, green, blue and alpha values.
+
+#### `white`
+
+``` purescript
+white :: Color
+```
+
+The color white.
+
+### Re-exported from Graphics.Drawing.Font:
+
+#### `Font`
+
+``` purescript
+data Font
+```
+
+Fonts.
+
+##### Instances
+``` purescript
+Eq Font
+```
+
+#### `fontString`
+
+``` purescript
+fontString :: Font -> String
+```
+
+Turn a `Font` into a `String` which can be used with `Graphics.Canvas.setFont`.
 

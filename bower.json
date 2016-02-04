@@ -11,14 +11,15 @@
     "test",
     "tests"
   ],
-  "repository": {                                                 
-    "type": "git",                                                
-    "url": "git://github.com/paf31/purescript-drawing.git"   
-  },                                                               
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/paf31/purescript-drawing.git"
+  },
   "dependencies": {
-    "purescript-canvas": "~0.3.1",
-    "purescript-lists": "~0.7.1",
-    "purescript-math": "~0.2.0",
-    "purescript-integers": "~0.2.1"
+    "purescript-canvas": "^0.3.1",
+    "purescript-lists": "^0.7.1",
+    "purescript-math": "^0.2.0",
+    "purescript-integers": "^0.2.1",
+    "purescript-colors": "^0.1.2"
   }
 }
