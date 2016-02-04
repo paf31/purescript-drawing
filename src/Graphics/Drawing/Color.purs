@@ -32,8 +32,8 @@ module Graphics.Drawing.Color
 
 import Prelude
 
-import Math
-import qualified Data.Int as I
+import Math ((%), abs)
+import Data.Int as I
 
 -- | Colors.
 data Color = Color Number Number Number Number
