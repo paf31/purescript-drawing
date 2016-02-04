@@ -10,6 +10,11 @@ data Font
 
 Fonts.
 
+##### Instances
+``` purescript
+Eq Font
+```
+
 #### `font`
 
 ``` purescript
@@ -33,6 +38,11 @@ newtype FontFamily
 ```
 
 Font family.
+
+##### Instances
+``` purescript
+Eq FontFamily
+```
 
 #### `serif`
 
@@ -92,8 +102,9 @@ Encapsulates font options.
 
 ##### Instances
 ``` purescript
-instance semigroupFontOptions :: Semigroup FontOptions
-instance monoidFontOptions :: Monoid FontOptions
+Eq FontOptions
+Semigroup FontOptions
+Monoid FontOptions
 ```
 
 #### `bold`

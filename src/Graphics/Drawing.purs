@@ -9,7 +9,7 @@ module Graphics.Drawing
   , Drawing(), filled, outlined, clipped, scale, translate, rotate, text
   , everywhere
   , render
-  , module Graphics.Drawing.Color
+  , module Color
   , module Graphics.Drawing.Font
   ) where
 
@@ -27,7 +27,7 @@ import Control.Monad.Eff (Eff)
 
 import Graphics.Canvas as Canvas
 
-import Graphics.Drawing.Color
+import Color
 import Graphics.Drawing.Font (Font(), fontString)
 
 -- | A `Point` consists of `x` and `y` coordinates.
@@ -293,7 +293,7 @@ render ctx = go
 
   applyShadow :: Shadow -> Eff (canvas :: Canvas.Canvas | eff) Unit
   applyShadow (Shadow s) = do
-    for_ s.color \color -> Canvas.setShadowColor (colorString color) ctx
+    for_ s.color \color -> Canvas.setShadowColor (cssStringHSLA color) ctx
     for_ s.blur \blur -> Canvas.setShadowBlur blur ctx
     for_ s.offset \offset -> do
       Canvas.setShadowOffsetX offset.x ctx
@@ -301,11 +301,11 @@ render ctx = go
 
   applyFillStyle :: FillStyle -> Eff (canvas :: Canvas.Canvas | eff) Unit
   applyFillStyle (FillStyle fs) = do
-    for_ fs.color $ \color -> Canvas.setFillStyle (colorString color) ctx
+    for_ fs.color $ \color -> Canvas.setFillStyle (cssStringHSLA color) ctx
 
   applyOutlineStyle :: OutlineStyle -> Eff (canvas :: Canvas.Canvas | eff) Unit
   applyOutlineStyle (OutlineStyle fs) = do
-    for_ fs.color $ \color -> Canvas.setStrokeStyle (colorString color) ctx
+    for_ fs.color $ \color -> Canvas.setStrokeStyle (cssStringHSLA color) ctx
     for_ fs.lineWidth $ \width -> Canvas.setLineWidth width ctx
 
   renderShape :: Shape -> Eff (canvas :: Canvas.Canvas | eff) Unit
