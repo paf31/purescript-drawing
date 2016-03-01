@@ -13,6 +13,9 @@ import Control.Monad.Eff
 import Graphics.Drawing
 import Graphics.Canvas (getCanvasElementById, getContext2D)
 
+import Color.Scale (sample)
+import Color.Scale.Perceptual (magma)
+
 main = do
   Just canvas <- getCanvasElementById "canvas"
   ctx <- getContext2D canvas
@@ -28,7 +31,7 @@ main = do
   go 0 = mempty
   go n =
     let dr = scale s s (go (n - 1))
-    in filled (fillColor (lighten (1.0 - toNumber n / 6.0) black)) (closed pentagon)
+    in filled (fillColor (sample magma (1.0 - toNumber (n - 1) / 5.0))) (closed pentagon)
        <> fold do i <- 0..4
                   return (rotate (Math.pi / 2.5 * (toNumber i + 0.5)) (translate 0.0 (Math.cos (Math.pi / 5.0) * (1.0 + s)) dr))
 
