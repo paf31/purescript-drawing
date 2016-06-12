@@ -13,22 +13,23 @@ module Graphics.Drawing
   , module Graphics.Drawing.Font
   ) where
 
-import Prelude
+import Prelude (class Eq, class Semigroup, Unit, void, when, bind, unit, pure,
+                map, flip, (*), ($), (==), (&&), (<>), (<<<))
 
-import Data.List (List(..), singleton, (:), toList)
+import Data.List (List(..), singleton, (:), fromFoldable)
 import Data.Maybe (Maybe(..), maybe, isNothing)
 import Data.Monoid (class Monoid, mempty)
 import Data.Foldable (class Foldable, for_)
 
 import Control.Alt ((<|>))
-import Control.Monad (when)
-
 import Control.Monad.Eff (Eff)
 
 import Graphics.Canvas as Canvas
+import Graphics.Drawing.Font (Font(), fontString)
+
+import Math (pi)
 
 import Color
-import Graphics.Drawing.Font (Font(), fontString)
 
 -- | A `Point` consists of `x` and `y` coordinates.
 type Point = { x :: Number, y :: Number }
@@ -45,7 +46,7 @@ data Shape
   | Composite (List Shape)
 
 instance semigroupShape :: Semigroup Shape where
-  append (Composite ds) d = Composite (ds ++ singleton d)
+  append (Composite ds) d = Composite (ds <> singleton d)
   append d (Composite ds) = Composite (d : ds)
   append d1 d2 = Composite (Cons d1 (Cons d2 Nil))
 
@@ -68,11 +69,11 @@ instance eqShape :: Eq Shape where
 
 -- | Create a path.
 path :: forall f. (Foldable f) => f Point -> Shape
-path = Path false <<< toList
+path = Path false <<< fromFoldable
 
 -- | Create a _closed_ path.
 closed :: forall f. (Foldable f) => f Point -> Shape
-closed = Path true <<< toList
+closed = Path true <<< fromFoldable
 
 -- | Create a rectangle from the left, top, width and height parameters.
 rectangle :: Number -> Number -> Number -> Number -> Shape
@@ -181,7 +182,7 @@ data Drawing
   | WithShadow Shadow Drawing
 
 instance semigroupDrawing :: Semigroup Drawing where
-  append (Many ds) d = Many (ds ++ singleton d)
+  append (Many ds) d = Many (ds <> singleton d)
   append d (Many ds) = Many (d : ds)
   append d1 d2 = Many (Cons d1 (Cons d2 Nil))
 
@@ -258,7 +259,7 @@ everywhere f = go
   go other = f other
 
 -- | Render a `Drawing` to a canvas.
-render :: forall eff. Canvas.Context2D -> Drawing -> Eff (canvas :: Canvas.Canvas | eff) Unit
+render :: forall eff. Canvas.Context2D -> Drawing -> Eff (canvas :: Canvas.CANVAS | eff) Unit
 render ctx = go
   where
   go (Fill sh style) = void $ Canvas.withContext ctx do
@@ -291,7 +292,7 @@ render ctx = go
     applyFillStyle style
     Canvas.fillText ctx s x y
 
-  applyShadow :: Shadow -> Eff (canvas :: Canvas.Canvas | eff) Unit
+  applyShadow :: Shadow -> Eff (canvas :: Canvas.CANVAS | eff) Unit
   applyShadow (Shadow s) = do
     for_ s.color \color -> Canvas.setShadowColor (cssStringHSLA color) ctx
     for_ s.blur \blur -> Canvas.setShadowBlur blur ctx
@@ -299,21 +300,21 @@ render ctx = go
       Canvas.setShadowOffsetX offset.x ctx
       Canvas.setShadowOffsetY offset.y ctx
 
-  applyFillStyle :: FillStyle -> Eff (canvas :: Canvas.Canvas | eff) Unit
+  applyFillStyle :: FillStyle -> Eff (canvas :: Canvas.CANVAS | eff) Unit
   applyFillStyle (FillStyle fs) = do
     for_ fs.color $ \color -> Canvas.setFillStyle (cssStringHSLA color) ctx
 
-  applyOutlineStyle :: OutlineStyle -> Eff (canvas :: Canvas.Canvas | eff) Unit
+  applyOutlineStyle :: OutlineStyle -> Eff (canvas :: Canvas.CANVAS | eff) Unit
   applyOutlineStyle (OutlineStyle fs) = do
     for_ fs.color $ \color -> Canvas.setStrokeStyle (cssStringHSLA color) ctx
     for_ fs.lineWidth $ \width -> Canvas.setLineWidth width ctx
 
-  renderShape :: Shape -> Eff (canvas :: Canvas.Canvas | eff) Unit
-  renderShape (Path _ Nil) = return unit
+  renderShape :: Shape -> Eff (canvas :: Canvas.CANVAS | eff) Unit
+  renderShape (Path _ Nil) = pure unit
   renderShape (Path cl (Cons p rest)) = do
     Canvas.moveTo ctx p.x p.y
     for_ rest \p -> Canvas.lineTo ctx p.x p.y
     when cl $ void $ Canvas.closePath ctx
   renderShape (Rectangle r) = void $ Canvas.rect ctx r
-  renderShape (Circle c) = void $ Canvas.arc ctx { x: c.x, y: c.y, r: c.r, start: 0.0, end: Math.pi * 2.0 }
+  renderShape (Circle c) = void $ Canvas.arc ctx { x: c.x, y: c.y, r: c.r, start: 0.0, end: pi * 2.0 }
   renderShape (Composite ds) = for_ ds renderShape
