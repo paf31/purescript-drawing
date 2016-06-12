@@ -28,7 +28,7 @@ font = Font
 
 -- | Turn a `Font` into a `String` which can be used with `Graphics.Canvas.setFont`.
 fontString :: Font -> String
-fontString (Font (FontFamily family) px opts) = optionsString opts ++ " " ++ show px ++ "px " ++ family
+fontString (Font (FontFamily family) px opts) = optionsString opts <> " " <> show px <> "px " <> family
 
 -- | Font family.
 newtype FontFamily = FontFamily String

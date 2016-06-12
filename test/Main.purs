@@ -2,22 +2,28 @@ module Test.Main where
 
 import Prelude
 
-import Data.Int
-import Data.Maybe
+import Data.Int (toNumber)
+import Data.Maybe (fromJust)
 import Data.Array ((..))
 import Data.Monoid (mempty)
 import Data.Foldable (fold)
 
-import Control.Monad.Eff
+import Control.Monad.Eff (Eff)
 
-import Graphics.Drawing
-import Graphics.Canvas (getCanvasElementById, getContext2D)
+import Graphics.Drawing (scale, translate, shadowBlur, black, shadowColor,
+                         shadow, render, rotate, closed, fillColor, filled)
+import Graphics.Canvas (CANVAS, getCanvasElementById, getContext2D)
+import Partial.Unsafe (unsafePartial)
+
+import Math (sin, cos, pi)
 
 import Color.Scale (sample)
 import Color.Scale.Perceptual (magma)
 
+main :: Eff (canvas :: CANVAS) Unit
 main = do
-  Just canvas <- getCanvasElementById "canvas"
+  mcanvas <- getCanvasElementById "canvas"
+  let canvas = unsafePartial (fromJust mcanvas)
   ctx <- getContext2D canvas
 
   render ctx $
@@ -33,9 +39,9 @@ main = do
     let dr = scale s s (go (n - 1))
     in filled (fillColor (sample magma (1.0 - toNumber (n - 1) / 5.0))) (closed pentagon)
        <> fold do i <- 0..4
-                  return (rotate (Math.pi / 2.5 * (toNumber i + 0.5)) (translate 0.0 (Math.cos (Math.pi / 5.0) * (1.0 + s)) dr))
+                  pure (rotate (pi / 2.5 * (toNumber i + 0.5)) (translate 0.0 (cos (pi / 5.0) * (1.0 + s)) dr))
 
   pentagon = do
     i <- 0..5
-    let theta = Math.pi / 2.5 * toNumber i
-    return { x: Math.sin theta, y: Math.cos theta }
+    let theta = pi / 2.5 * toNumber i
+    pure { x: sin theta, y: cos theta }
