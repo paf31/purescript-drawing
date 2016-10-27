@@ -1,26 +1,22 @@
 -- | This module defines preset fonts, and functions for creating fonts.
 
 module Graphics.Drawing.Font
-  ( Font(), font, fontString
-  , FontFamily(), serif, sansSerif, monospace, cursive, fantasy, customFont
-  , FontOptions(), bold, bolder, light, italic, oblique, smallCaps
+  ( Font, font, fontString
+  , FontFamily, serif, sansSerif, monospace, cursive, fantasy, customFont
+  , FontOptions, bold, bolder, light, italic, oblique, smallCaps
   ) where
 
 import Prelude
 
+import Control.Alt ((<|>))
+import Data.Foldable (fold, intercalate)
 import Data.Maybe (Maybe(..))
 import Data.Monoid (class Monoid)
-import Data.Foldable (fold, intercalate)
-
-import Control.Alt ((<|>))
 
 -- | Fonts.
 data Font = Font FontFamily Int FontOptions
 
-instance eqFont :: Eq Font where
-  eq (Font a b c) (Font a' b' c') = a == a'
-                                 && b == b'
-                                 && c == c'
+derive instance eqFont :: Eq Font
 
 -- | Create a `Font`.
 font :: FontFamily -> Int -> FontOptions -> Font
@@ -33,8 +29,7 @@ fontString (Font (FontFamily family) px opts) = optionsString opts <> " " <> sho
 -- | Font family.
 newtype FontFamily = FontFamily String
 
-instance eqFontFamily :: Eq FontFamily where
-  eq (FontFamily a) (FontFamily a') = a == a'
+derive instance eqFontFamily :: Eq FontFamily
 
 -- | Serif font
 serif :: FontFamily

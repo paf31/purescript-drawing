@@ -1,12 +1,12 @@
 -- | This module defines a type `Drawing` for creating vector graphics.
 
 module Graphics.Drawing
-  ( Point()
-  , Shape(), path, closed, rectangle, circle
-  , FillStyle(), fillColor
-  , OutlineStyle(), outlineColor, lineWidth
-  , Shadow(), shadowOffset, shadowBlur, shadowColor, shadow
-  , Drawing(), filled, outlined, clipped, scale, translate, rotate, text
+  ( Point
+  , Shape, path, closed, rectangle, circle
+  , FillStyle, fillColor
+  , OutlineStyle, outlineColor, lineWidth
+  , Shadow, shadowOffset, shadowBlur, shadowColor, shadow
+  , Drawing, filled, outlined, clipped, scale, translate, rotate, text
   , everywhere
   , render
   , module Color
@@ -16,20 +16,16 @@ module Graphics.Drawing
 import Prelude (class Eq, class Semigroup, Unit, void, when, bind, unit, pure,
                 map, flip, (*), ($), (==), (&&), (<>), (<<<))
 
+import Color
+import Control.Alt ((<|>))
+import Control.Monad.Eff (Eff)
+import Data.Foldable (class Foldable, for_)
 import Data.List (List(..), singleton, (:), fromFoldable)
 import Data.Maybe (Maybe(..), maybe, isNothing)
 import Data.Monoid (class Monoid, mempty)
-import Data.Foldable (class Foldable, for_)
-
-import Control.Alt ((<|>))
-import Control.Monad.Eff (Eff)
-
 import Graphics.Canvas as Canvas
 import Graphics.Drawing.Font (Font(), fontString)
-
 import Math (pi)
-
-import Color
 
 -- | A `Point` consists of `x` and `y` coordinates.
 type Point = { x :: Number, y :: Number }

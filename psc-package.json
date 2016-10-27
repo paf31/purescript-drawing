@@ -1,0 +1,13 @@
+{
+    "name": "purescript-drawing",
+    "set": "psc-0.10.1",
+    "source": "https://raw.githubusercontent.com/purescript/package-sets/psc-0.10.1/packages.json",
+    "depends": [
+        "integers",
+        "math",
+        "lists",
+        "canvas",
+        "colors",
+        "prelude"
+    ]
+}

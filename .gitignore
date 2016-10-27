@@ -1,5 +1,7 @@
 bower_components/
 node_modules/
 output/
-dist/
+html/index.js
 .pulp-cache/
+.psc-ide-port
+.psc-package/
