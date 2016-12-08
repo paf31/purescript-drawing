@@ -36,8 +36,8 @@ data Shape
   = Path Boolean (List Point)
   -- | A rectangle consisting of the numbers left, top, width and height
   | Rectangle { x :: Number, y :: Number, w :: Number, h :: Number }
-  -- | A circle consisting of the numbers center-x, center-y and radius
-  | Circle { x :: Number, y :: Number, r :: Number }
+  -- | A circular arc consisting of the numbers center-x, center-y, start angle, end angle and radius
+  | Arc { x :: Number, y :: Number, start :: Number, end :: Number, r :: Number }
   -- | A composite shape
   | Composite (List Shape)
 
@@ -57,8 +57,10 @@ instance eqShape :: Eq Shape where
                                  && a.y == a'.y
                                  && a.w == a'.w
                                  && a.h == a'.h
-  eq (Circle a) (Circle a') = a.x == a'.x
+  eq (Arc a) (Arc a') = a.x == a'.x
                            && a.y == a'.y
+                           && a.start == a'.start
+                           && a.end == a'.end
                            && a.r == a'.r
   eq (Composite a) (Composite a') = a == a'
   eq _ _ = false
@@ -77,7 +79,12 @@ rectangle x y w h = Rectangle { x: x, y: y, w: w, h: h }
 
 -- | Create a circle from the left, top and radius parameters.
 circle :: Number -> Number -> Number -> Shape
-circle x y r = Circle { x: x, y: y, r: r }
+circle x y r = Arc { x: x, y: y, start: 0.0, end: pi * 2.0, r: r }
+
+-- | Create a circular arc from the left, top, start angle, end angle and
+-- | radius parameters.
+arc :: Number -> Number -> Number -> Number -> Number -> Shape
+arc x y start end r = Arc { x: x, y: y, start: start, end: end, r: r }
 
 -- | Encapsulates fill color etc.
 newtype FillStyle = FillStyle
@@ -312,5 +319,5 @@ render ctx = go
     for_ rest \p -> Canvas.lineTo ctx p.x p.y
     when cl $ void $ Canvas.closePath ctx
   renderShape (Rectangle r) = void $ Canvas.rect ctx r
-  renderShape (Circle c) = void $ Canvas.arc ctx { x: c.x, y: c.y, r: c.r, start: 0.0, end: pi * 2.0 }
+  renderShape (Arc a) = void $ Canvas.arc ctx a
   renderShape (Composite ds) = for_ ds renderShape
