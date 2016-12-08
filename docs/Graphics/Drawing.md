@@ -57,6 +57,15 @@ circle :: Number -> Number -> Number -> Shape
 
 Create a circle from the left, top and radius parameters.
 
+#### `arc`
+
+``` purescript
+arc :: Number -> Number -> Number -> Number -> Number -> Shape
+```
+
+Create a circular arc from the left, top, start angle, end angle and
+radius parameters.
+
 #### `FillStyle`
 
 ``` purescript

@@ -2,7 +2,7 @@
 
 module Graphics.Drawing
   ( Point
-  , Shape, path, closed, rectangle, circle
+  , Shape, path, closed, rectangle, circle, arc
   , FillStyle, fillColor
   , OutlineStyle, outlineColor, lineWidth
   , Shadow, shadowOffset, shadowBlur, shadowColor, shadow
@@ -75,16 +75,16 @@ closed = Path true <<< fromFoldable
 
 -- | Create a rectangle from the left, top, width and height parameters.
 rectangle :: Number -> Number -> Number -> Number -> Shape
-rectangle x y w h = Rectangle { x: x, y: y, w: w, h: h }
+rectangle x y w h = Rectangle { x, y, w, h }
 
 -- | Create a circle from the left, top and radius parameters.
 circle :: Number -> Number -> Number -> Shape
-circle x y r = Arc { x: x, y: y, start: 0.0, end: pi * 2.0, r: r }
+circle x y = arc x y 0.0 (pi * 2.0)
 
 -- | Create a circular arc from the left, top, start angle, end angle and
 -- | radius parameters.
 arc :: Number -> Number -> Number -> Number -> Number -> Shape
-arc x y start end r = Arc { x: x, y: y, start: start, end: end, r: r }
+arc x y start end r = Arc { x, y, start, end, r }
 
 -- | Encapsulates fill color etc.
 newtype FillStyle = FillStyle
@@ -97,8 +97,7 @@ instance semigroupFillStyle :: Semigroup FillStyle where
 instance monoidFillStyle :: Monoid FillStyle where
   mempty = FillStyle { color: Nothing }
 
-instance eqFillStyle :: Eq FillStyle where
-  eq (FillStyle a) (FillStyle a') = a.color == a'.color
+derive instance eqFillStyle :: Eq FillStyle
 
 -- | Set the fill color.
 fillColor :: Color -> FillStyle
@@ -128,9 +127,7 @@ instance monoidOutlineStyle :: Monoid OutlineStyle where
                         , lineWidth: Nothing
                         }
 
-instance eqOutlineStyle :: Eq OutlineStyle where
-  eq (OutlineStyle a) (OutlineStyle a') = a.color == a'.color
-                                       && a.lineWidth == a'.lineWidth
+derive instance eqOutlineStyle :: Eq OutlineStyle
 
 -- | Encapsulates shadow settings etc.
 newtype Shadow = Shadow
@@ -192,30 +189,7 @@ instance semigroupDrawing :: Semigroup Drawing where
 instance monoidDrawing :: Monoid Drawing where
   mempty = Many mempty
 
-instance eqDrawing :: Eq Drawing where
-  eq (Fill a b) (Fill a' b') = a == a'
-                            && b == b'
-  eq (Outline a b) (Outline a' b') = a == a'
-                                  && b == b'
-  eq (Text a b c d e) (Text a' b' c' d' e') = a == a'
-                                           && b == b'
-                                           && c == c'
-                                           && d == d'
-                                           && e == e'
-  eq (Many a) (Many a') = a == a'
-  eq (Scale a b) (Scale a' b') = a.scaleX == a'.scaleX
-                              && a.scaleY == a'.scaleY
-                              && b == b'
-  eq (Translate a b) (Translate a' b') = a.translateX == a'.translateX
-                                      && a.translateY == a'.translateY
-                                      && b == b'
-  eq (Rotate a b) (Rotate a' b') = a == a'
-                                && b == b'
-  eq (Clipped a b) (Clipped a' b') = a == a'
-                                  && b == b'
-  eq (WithShadow a b) (WithShadow a' b') = a == a'
-                                        && b == b'
-  eq _ _ = false
+derive instance eqDrawing :: Eq Drawing
 
 -- | Fill a `Shape`.
 filled :: FillStyle -> Shape -> Drawing
