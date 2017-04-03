@@ -16,10 +16,10 @@
     "url": "git://github.com/paf31/purescript-drawing.git"
   },
   "dependencies": {
-    "purescript-canvas": "^2.0.0",
-    "purescript-lists": "^3.0.0",
+    "purescript-canvas": "^3.0.0",
+    "purescript-lists": "^4.0.0",
     "purescript-math": "^2.0.0",
-    "purescript-integers": "^2.0.0",
-    "purescript-colors": "^2.0.0"
+    "purescript-integers": "^3.0.0",
+    "purescript-colors": "^3.0.0"
   }
 }

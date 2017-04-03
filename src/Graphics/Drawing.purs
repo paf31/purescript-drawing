@@ -14,7 +14,7 @@ module Graphics.Drawing
   ) where
 
 import Prelude (class Eq, class Semigroup, Unit, void, when, bind, unit, pure,
-                map, flip, (*), ($), (==), (&&), (<>), (<<<))
+                discard, map, flip, (*), ($), (==), (&&), (<>), (<<<))
 
 import Color
 import Control.Alt ((<|>))
@@ -249,23 +249,23 @@ render ctx = go
       renderShape sh
   go (Many ds) = for_ ds go
   go (Scale s d) = void $ Canvas.withContext ctx do
-    Canvas.scale s ctx
+    _ <- Canvas.scale s ctx
     go d
   go (Translate t d) = void $ Canvas.withContext ctx do
-    Canvas.translate t ctx
+    _ <- Canvas.translate t ctx
     go d
   go (Rotate r d) = void $ Canvas.withContext ctx do
-    Canvas.rotate r ctx
+    _ <- Canvas.rotate r ctx
     go d
   go (Clipped sh d) = void $ Canvas.withContext ctx do
     renderShape sh
-    Canvas.clip ctx
+    _ <- Canvas.clip ctx
     go d
   go (WithShadow sh d) = void $ Canvas.withContext ctx do
     applyShadow sh
     go d
   go (Text font x y style s) = void $ Canvas.withContext ctx do
-    Canvas.setFont (fontString font) ctx
+    _ <- Canvas.setFont (fontString font) ctx
     applyFillStyle style
     Canvas.fillText ctx s x y
 
@@ -274,7 +274,7 @@ render ctx = go
     for_ s.color \color -> Canvas.setShadowColor (cssStringHSLA color) ctx
     for_ s.blur \blur -> Canvas.setShadowBlur blur ctx
     for_ s.offset \offset -> do
-      Canvas.setShadowOffsetX offset.x ctx
+      _ <- Canvas.setShadowOffsetX offset.x ctx
       Canvas.setShadowOffsetY offset.y ctx
 
   applyFillStyle :: FillStyle -> Eff (canvas :: Canvas.CANVAS | eff) Unit
@@ -289,8 +289,8 @@ render ctx = go
   renderShape :: Shape -> Eff (canvas :: Canvas.CANVAS | eff) Unit
   renderShape (Path _ Nil) = pure unit
   renderShape (Path cl (Cons p rest)) = do
-    Canvas.moveTo ctx p.x p.y
-    for_ rest \p -> Canvas.lineTo ctx p.x p.y
+    _ <- Canvas.moveTo ctx p.x p.y
+    for_ rest \pt -> Canvas.lineTo ctx pt.x pt.y
     when cl $ void $ Canvas.closePath ctx
   renderShape (Rectangle r) = void $ Canvas.rect ctx r
   renderShape (Arc a) = void $ Canvas.arc ctx a
