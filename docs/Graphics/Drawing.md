@@ -249,7 +249,7 @@ Modify a `Drawing` by applying a transformation to every subdrawing.
 #### `render`
 
 ``` purescript
-render :: forall eff. Context2D -> Drawing -> Eff (canvas :: CANVAS | eff) Unit
+render :: Context2D -> Drawing -> Effect Unit
 ```
 
 Render a `Drawing` to a canvas.

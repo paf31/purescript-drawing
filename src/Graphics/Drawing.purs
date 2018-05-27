@@ -13,19 +13,18 @@ module Graphics.Drawing
   , module Graphics.Drawing.Font
   ) where
 
-import Prelude (class Eq, class Semigroup, Unit, void, when, bind, unit, pure,
-                discard, map, flip, (*), ($), (==), (&&), (<>), (<<<))
-
 import Color
+
 import Control.Alt ((<|>))
-import Control.Monad.Eff (Eff)
 import Data.Foldable (class Foldable, for_)
 import Data.List (List(..), singleton, (:), fromFoldable)
 import Data.Maybe (Maybe(..), maybe, isNothing)
 import Data.Monoid (class Monoid, mempty)
+import Effect (Effect)
 import Graphics.Canvas as Canvas
-import Graphics.Drawing.Font (Font(), fontString)
+import Graphics.Drawing.Font (Font, fontString)
 import Math (pi)
+import Prelude (class Eq, class Semigroup, Unit, void, when, bind, unit, pure, discard, map, flip, (*), ($), (==), (&&), (<>), (<<<))
 
 -- | A `Point` consists of `x` and `y` coordinates.
 type Point = { x :: Number, y :: Number }
@@ -236,7 +235,7 @@ everywhere f = go
   go other = f other
 
 -- | Render a `Drawing` to a canvas.
-render :: forall eff. Canvas.Context2D -> Drawing -> Eff (canvas :: Canvas.CANVAS | eff) Unit
+render :: Canvas.Context2D -> Drawing -> Effect Unit
 render ctx = go
   where
   go (Fill sh style) = void $ Canvas.withContext ctx do
@@ -249,13 +248,13 @@ render ctx = go
       renderShape sh
   go (Many ds) = for_ ds go
   go (Scale s d) = void $ Canvas.withContext ctx do
-    _ <- Canvas.scale s ctx
+    _ <- Canvas.scale ctx s
     go d
   go (Translate t d) = void $ Canvas.withContext ctx do
-    _ <- Canvas.translate t ctx
+    _ <- Canvas.translate ctx t
     go d
   go (Rotate r d) = void $ Canvas.withContext ctx do
-    _ <- Canvas.rotate r ctx
+    _ <- Canvas.rotate ctx r
     go d
   go (Clipped sh d) = void $ Canvas.withContext ctx do
     renderShape sh
@@ -265,28 +264,28 @@ render ctx = go
     applyShadow sh
     go d
   go (Text font x y style s) = void $ Canvas.withContext ctx do
-    _ <- Canvas.setFont (fontString font) ctx
+    _ <- Canvas.setFont ctx (fontString font)
     applyFillStyle style
     Canvas.fillText ctx s x y
 
-  applyShadow :: Shadow -> Eff (canvas :: Canvas.CANVAS | eff) Unit
+  applyShadow :: Shadow -> Effect Unit
   applyShadow (Shadow s) = do
-    for_ s.color \color -> Canvas.setShadowColor (cssStringHSLA color) ctx
-    for_ s.blur \blur -> Canvas.setShadowBlur blur ctx
+    for_ s.color \color -> Canvas.setShadowColor ctx (cssStringHSLA color)
+    for_ s.blur \blur -> Canvas.setShadowBlur ctx blur
     for_ s.offset \offset -> do
-      _ <- Canvas.setShadowOffsetX offset.x ctx
-      Canvas.setShadowOffsetY offset.y ctx
+      _ <- Canvas.setShadowOffsetX ctx offset.x
+      Canvas.setShadowOffsetY ctx offset.y
 
-  applyFillStyle :: FillStyle -> Eff (canvas :: Canvas.CANVAS | eff) Unit
+  applyFillStyle :: FillStyle -> Effect Unit
   applyFillStyle (FillStyle fs) = do
-    for_ fs.color $ \color -> Canvas.setFillStyle (cssStringHSLA color) ctx
+    for_ fs.color $ \color -> Canvas.setFillStyle ctx (cssStringHSLA color)
 
-  applyOutlineStyle :: OutlineStyle -> Eff (canvas :: Canvas.CANVAS | eff) Unit
+  applyOutlineStyle :: OutlineStyle -> Effect Unit
   applyOutlineStyle (OutlineStyle fs) = do
-    for_ fs.color $ \color -> Canvas.setStrokeStyle (cssStringHSLA color) ctx
-    for_ fs.lineWidth $ \width -> Canvas.setLineWidth width ctx
+    for_ fs.color $ \color -> Canvas.setStrokeStyle ctx (cssStringHSLA color)
+    for_ fs.lineWidth $ \width -> Canvas.setLineWidth ctx width
 
-  renderShape :: Shape -> Eff (canvas :: Canvas.CANVAS | eff) Unit
+  renderShape :: Shape -> Effect Unit
   renderShape (Path _ Nil) = pure unit
   renderShape (Path cl (Cons p rest)) = do
     _ <- Canvas.moveTo ctx p.x p.y
