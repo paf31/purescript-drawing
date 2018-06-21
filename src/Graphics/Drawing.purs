@@ -10,21 +10,22 @@ module Graphics.Drawing
   , everywhere
   , render
   , module Color
-  , module Graphics.Drawing.Font
+  , module Font
   ) where
 
-import Color
+import Prelude
 
+import Color (Color, cssStringHSLA)
+import Color (Color) as Color
 import Control.Alt ((<|>))
 import Data.Foldable (class Foldable, for_)
 import Data.List (List(..), singleton, (:), fromFoldable)
-import Data.Maybe (Maybe(..), maybe, isNothing)
-import Data.Monoid (class Monoid, mempty)
+import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Graphics.Canvas as Canvas
 import Graphics.Drawing.Font (Font, fontString)
+import Graphics.Drawing.Font (Font) as Font
 import Math (pi)
-import Prelude (class Eq, class Semigroup, Unit, void, when, bind, unit, pure, discard, map, flip, (*), ($), (==), (&&), (<>), (<<<))
 
 -- | A `Point` consists of `x` and `y` coordinates.
 type Point = { x :: Number, y :: Number }
@@ -34,11 +35,13 @@ data Shape
   -- | A path is a list of points joined by line segments
   = Path Boolean (List Point)
   -- | A rectangle consisting of the numbers left, top, width and height
-  | Rectangle { x :: Number, y :: Number, w :: Number, h :: Number }
+  | Rectangle Canvas.Rectangle
   -- | A circular arc consisting of the numbers center-x, center-y, start angle, end angle and radius
-  | Arc { x :: Number, y :: Number, start :: Number, end :: Number, r :: Number }
+  | Arc Canvas.Arc
   -- | A composite shape
   | Composite (List Shape)
+  
+derive instance eqShape :: Eq Shape
 
 instance semigroupShape :: Semigroup Shape where
   append (Composite ds) d = Composite (ds <> singleton d)
@@ -47,22 +50,6 @@ instance semigroupShape :: Semigroup Shape where
 
 instance monoidShape :: Monoid Shape where
   mempty = Composite mempty
-
-instance eqShape :: Eq Shape where
-  eq (Path a b) (Path a' b') = a == a'
-                            && map _.x b == map _.x b'
-                            && map _.y b == map _.y b'
-  eq (Rectangle a) (Rectangle a') = a.x == a'.x
-                                 && a.y == a'.y
-                                 && a.w == a'.w
-                                 && a.h == a'.h
-  eq (Arc a) (Arc a') = a.x == a'.x
-                           && a.y == a'.y
-                           && a.start == a'.start
-                           && a.end == a'.end
-                           && a.r == a'.r
-  eq (Composite a) (Composite a') = a == a'
-  eq _ _ = false
 
 -- | Create a path.
 path :: forall f. (Foldable f) => f Point -> Shape
@@ -74,7 +61,7 @@ closed = Path true <<< fromFoldable
 
 -- | Create a rectangle from the left, top, width and height parameters.
 rectangle :: Number -> Number -> Number -> Number -> Shape
-rectangle x y w h = Rectangle { x, y, w, h }
+rectangle x y width height = Rectangle { x, y, width, height }
 
 -- | Create a circle from the left, top and radius parameters.
 circle :: Number -> Number -> Number -> Shape
@@ -83,7 +70,7 @@ circle x y = arc x y 0.0 (pi * 2.0)
 -- | Create a circular arc from the left, top, start angle, end angle and
 -- | radius parameters.
 arc :: Number -> Number -> Number -> Number -> Number -> Shape
-arc x y start end r = Arc { x, y, start, end, r }
+arc x y start end radius = Arc { x, y, start, end, radius }
 
 -- | Encapsulates fill color etc.
 newtype FillStyle = FillStyle
@@ -135,14 +122,7 @@ newtype Shadow = Shadow
   , offset :: Maybe { x :: Number, y :: Number }
   }
 
-instance eqShadow :: Eq Shadow where
-  eq (Shadow a) (Shadow a') = a.color == a'.color
-                           && a.blur  == a'.blur
-                           && maybe (isNothing a'.offset)
-                                    (\o -> maybe false
-                                                 (\o' -> o.x == o'.x && o.y == o'.y)
-                                                 a'.offset)
-                                    a.offset
+derive instance eqShadow :: Eq Shadow
 
 -- | Set the shadow color.
 shadowColor :: Color -> Shadow

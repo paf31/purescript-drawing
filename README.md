@@ -9,4 +9,6 @@ Functional rendering using PureScript and HTML 5 Canvas
 - [Module Documentation](docs/Graphics/Drawing.md)
 - [Example](test/Main.purs)
 
+Run the example with `npm run example`.
+
 ![Snowflake](Snowflake.png "Snowflake")

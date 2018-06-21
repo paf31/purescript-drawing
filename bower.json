@@ -16,7 +16,7 @@
     "url": "git://github.com/paf31/purescript-drawing.git"
   },
   "dependencies": {
-    "purescript-canvas": "justinwoo/purescript-canvas#compiler/0.12",
+    "purescript-canvas": "^4.0.0",
     "purescript-lists": "^5.0.0",
     "purescript-math": "^2.1.1",
     "purescript-integers": "^4.0.0",
