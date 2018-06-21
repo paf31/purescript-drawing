@@ -11,7 +11,6 @@ import Prelude
 import Control.Alt ((<|>))
 import Data.Foldable (fold, intercalate)
 import Data.Maybe (Maybe(..))
-import Data.Monoid (class Monoid)
 
 -- | Fonts.
 data Font = Font FontFamily Int FontOptions

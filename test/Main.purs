@@ -5,14 +5,13 @@ import Prelude
 import Data.Int (toNumber)
 import Data.Maybe (fromJust)
 import Data.Array ((..))
-import Data.Monoid (mempty)
 import Data.Foldable (fold)
 
-import Control.Monad.Eff (Eff)
+import Effect (Effect)
 
 import Graphics.Drawing (scale, translate, shadowBlur, black, shadowColor,
                          shadow, render, rotate, closed, fillColor, filled)
-import Graphics.Canvas (CANVAS, getCanvasElementById, getContext2D)
+import Graphics.Canvas (getCanvasElementById, getContext2D)
 import Partial.Unsafe (unsafePartial)
 
 import Math (sin, cos, pi)
@@ -20,7 +19,7 @@ import Math (sin, cos, pi)
 import Color.Scale (sample)
 import Color.Scale.Perceptual (magma)
 
-main :: Eff (canvas :: CANVAS) Unit
+main :: Effect Unit
 main = do
   mcanvas <- getCanvasElementById "canvas"
   let canvas = unsafePartial (fromJust mcanvas)
